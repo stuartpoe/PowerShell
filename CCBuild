@@ -13,6 +13,11 @@ $subnet3 =New-AzVirtualNetworkSubnetConfig -Name Subnet3 -AddressPrefix "10.0.3.
 
 $storage ='cyccldstoragetst'
 $storagesku = 'Standard_LRS'
+
+$VMName = "vm-CycleCloud1"
+$PublicIPName = "PubIp-$VMName"
+
+
 #$ctx= New-AzStorageContext -ResourceGroupName $rgstorage -Name $storage -Location $loc -SkuName $storagesku
 #$container = "cyclecloud"
 
@@ -30,7 +35,7 @@ New-AzVirtualNetwork -name $vnet  -ResourceGroupName $rgnetwork -Location $loc -
 #Storage
 New-AzResourceGroup -name $rgstorage -Location $loc
 New-AzStorageAccount -ResourceGroupName $rgstorage -Name $storage -Location $loc -SkuName $storagesku
-#New-AzStorageContainer -Name $container  -Permission Off -Context $ctx
+
 
 #VM Params
 #$adminUsername = Read-Host 'Admin username'
@@ -40,14 +45,12 @@ $AdminUsername = "adminuser"
 $AdminPassword = ConvertTo-SecureString "Password@123" -AsPlainText -Force
 
 $adminCreds    = New-Object PSCredential $adminUsername, $adminPassword
-
-
-$Subnet = Get-AzVirtualNetwork -name $vnet | Get-AzVirtualNetworkSubnetConfig -Name $SubnetName
-$Nic = New-AzNetworkInterface -ResourceGroupName $rgCC -Name "$VMName-nic" -Location $Loc -SubnetId $Subnet.Id
 $SubnetName = "subnet2"
+$Subnet = Get-AzVirtualNetwork -name $vnet | Get-AzVirtualNetworkSubnetConfig -Name $SubnetName
+$PublicIP = New-AzPublicIpAddress -ResourceGroupName $rgCC -Name $PublicIPName -Location $Loc -AllocationMethod Static -Sku Basic
+$Nic = New-AzNetworkInterface -ResourceGroupName $rgCC -Name "$VMName-nic" -Location $Loc -SubnetId $Subnet.Id -PublicIpAddressId $PublicIP.Id
 
 #VMConfig 
-$VMName = "vm-CycleCloud1"
 $VMSize = "Standard_DS1_v2"
 $ImagePublisher = "Canonical"
 $ImageOffer = "UbuntuServer"
@@ -56,6 +59,7 @@ $VMConfig = New-AzVMConfig -VMName $VMName -VMSize $VMSize
 $VMConfig = Set-AzVMOperatingSystem -VM $VMConfig -Linux -ComputerName $VMName -Credential $adminCreds
 $VMConfig = Set-AzVMSourceImage -VM $VMConfig -PublisherName $ImagePublisher -Offer $ImageOffer -Skus $ImageSku -Version "latest"
 $VMConfig = Add-AzVMNetworkInterface -VM $VMConfig -Id $Nic.Id
+$VMConfig = Set-AzVMBootDiagnostic -VM $VMConfig -Disable
 
 # Create the VM
 New-AzVM -ResourceGroupName $rgCC -Location $Loc -VM $VMConfig
