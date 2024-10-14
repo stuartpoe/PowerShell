@@ -33,16 +33,22 @@ New-AzStorageAccount -ResourceGroupName $rgstorage -Name $storage -Location $loc
 #New-AzStorageContainer -Name $container  -Permission Off -Context $ctx
 
 #VM Params
-$adminUsername = Read-Host 'adminuser'
-$adminPassword = Read-Host -AsSecureString 'Password@123'
+#$adminUsername = Read-Host 'Admin username'
+#$adminPassword = Read-Host -AsSecureString 'Admin password with least 12 characters'
+
+$AdminUsername = "adminuser"
+$AdminPassword = ConvertTo-SecureString "Password@123" -AsPlainText -Force
+
 $adminCreds    = New-Object PSCredential $adminUsername, $adminPassword
+
 
 $Subnet = Get-AzVirtualNetwork -name $vnet | Get-AzVirtualNetworkSubnetConfig -Name $SubnetName
 $Nic = New-AzNetworkInterface -ResourceGroupName $rgCC -Name "$VMName-nic" -Location $Loc -SubnetId $Subnet.Id
 $SubnetName = "subnet2"
 
 #VMConfig 
-$VMName = "vm-CycleCloud"
+$VMName = "vm-CycleCloud1
+"
 $VMSize = "Standard_DS1_v2"
 $ImagePublisher = "Canonical"
 $ImageOffer = "UbuntuServer"
