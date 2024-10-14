@@ -47,8 +47,7 @@ $Nic = New-AzNetworkInterface -ResourceGroupName $rgCC -Name "$VMName-nic" -Loca
 $SubnetName = "subnet2"
 
 #VMConfig 
-$VMName = "vm-CycleCloud1
-"
+$VMName = "vm-CycleCloud1"
 $VMSize = "Standard_DS1_v2"
 $ImagePublisher = "Canonical"
 $ImageOffer = "UbuntuServer"
