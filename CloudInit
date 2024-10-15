@@ -1,0 +1,14 @@
+    CloudInit = '''#!/bin/bash
+	exec 1>/var/log/cyclecloud_cloud_init.log 2>&1
+       #mkdir for volume mounts
+         #mkdir -p /netapp/home/rsm-ofse/rsm-iet/share/archive 
+    	 #chmod 755 /netapp   
+       #allow pw auth
+         file_path="/etc/ssh/sshd_config"
+         sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' "$file_path"
+         sudo systemctl restart sshd
+	sudo yum -y install nfs-utils	 
+	sudo mkdir /shared
+	sudo mount 10.126.136.197:/shared /shared
+	sudo /shared/domainjoin.sh
+       '''
